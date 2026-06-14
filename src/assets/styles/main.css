@@ -12,7 +12,7 @@
   --font-body: 'Inter', sans-serif;
 
   --radius-card: 8px;
-  --transition-base: 180ms ease;
+  --transition-base: 120ms ease;
   --max-width: 780px;
   --section-gap: 96px;
 
@@ -77,7 +77,7 @@ section {
 
 .page-enter-active,
 .page-leave-active {
-  transition: opacity 180ms ease;
+  transition: opacity 120ms ease;
 }
 
 .page-enter-from,
