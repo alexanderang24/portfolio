@@ -9,7 +9,7 @@ function applyTheme() {
 export function useTheme() {
   function initTheme() {
     const saved = localStorage.getItem('theme')
-    isDark.value = saved ? saved === 'dark' : true
+    isDark.value = saved ? saved === 'dark' : false
     applyTheme()
   }
 
