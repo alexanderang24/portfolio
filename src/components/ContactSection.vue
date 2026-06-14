@@ -10,6 +10,8 @@
         <a href="mailto:alexanderang.24@gmail.com">→ alexanderang.24@gmail.com</a>
         <a href="https://linkedin.com/in/alexanderang24" target="_blank" rel="noopener">→ linkedin.com/in/alexanderang24</a>
         <a href="https://github.com/alexanderang24" target="_blank" rel="noopener">→ github.com/alexanderang24</a>
+        <a href="https://leetcode.com/u/alexanderang24" target="_blank" rel="noopener">→ leetcode.com/u/alexanderang24</a>
+        <a href="https://hackerrank.com/alexanderang_24" target="_blank" rel="noopener">→ hackerrank.com/alexanderang_24</a>
       </div>
     </div>
   </section>
