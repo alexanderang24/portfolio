@@ -1,0 +1,4 @@
+export function readingTime(content) {
+  const words = content.trim().split(/\s+/).length
+  return `${Math.ceil(words / 200)} min read`
+}

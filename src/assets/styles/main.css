@@ -1,0 +1,86 @@
+:root {
+  --color-bg: #0d0d0f;
+  --color-surface: #141417;
+  --color-border: #1f1f24;
+  --color-accent: #6e7cf8;
+  --color-accent-dim: rgba(110, 124, 248, 0.12);
+  --color-text-primary: #ededee;
+  --color-text-secondary: #6b6b75;
+  --color-text-muted: #3f3f47;
+
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'Inter', sans-serif;
+
+  --radius-card: 8px;
+  --transition-base: 180ms ease;
+  --max-width: 780px;
+  --section-gap: 96px;
+
+  --color-code-text: #a9b7c6;
+  --color-syntax-keyword: #cc7832;
+  --color-syntax-string: #6a8759;
+  --color-syntax-number: #6897bb;
+  --color-syntax-comment: #7a7a7a;
+  --color-syntax-type: #a9b7c6;
+  --color-syntax-annotation: #ffc66d;
+}
+
+[data-theme="light"] {
+  --color-bg: #f2efe9;
+  --color-surface: #e8e4de;
+  --color-border: #e0dbd4;
+  --color-accent: #4a56d6;
+  --color-accent-dim: rgba(74, 86, 214, 0.10);
+  --color-text-primary: #1a1a20;
+  --color-text-secondary: #5a5a66;
+  --color-text-muted: #9a9aa8;
+  color-scheme: light;
+
+  --color-code-text: rgb(55, 55, 55);
+  --color-syntax-keyword: #a0521e;
+  --color-syntax-string: #3d6b30;
+  --color-syntax-number: #2e5f99;
+  --color-syntax-type: #3a5a78;
+  --color-syntax-annotation: #8b6e00;
+}
+
+html { scroll-behavior: smooth; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+.section-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  color: var(--color-text-primary);
+  margin-bottom: 2rem;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+section {
+  padding: var(--section-gap) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 180ms ease;
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
