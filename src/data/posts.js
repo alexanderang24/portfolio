@@ -41,45 +41,6 @@ When the same idempotency key arrives twice before the first request completes, 
 Building payments correctly means designing for the failure cases before writing the happy path.`,
   },
   {
-    id: 2,
-    slug: 'java-virtual-threads-in-practice',
-    title: 'Java Virtual Threads in Practice',
-    date: '2026-04-10',
-    category: 'Java',
-    tags: ['java', 'concurrency', 'performance'],
-    description:
-      'Project Loom\'s virtual threads landed in Java 21. Here\'s what changed in our Spring Boot services when we turned them on — and what didn\'t.',
-    content: `## What Virtual Threads Actually Are
-
-Virtual threads are lightweight threads managed by the JVM, not the OS. The key difference: blocking a virtual thread (waiting on I/O, a lock, a sleep) doesn't block the underlying OS thread. The JVM parks the virtual thread and uses the carrier thread for something else.
-
-For services that spend most of their time waiting on database queries or downstream HTTP calls — which is most backend services — this means you can run far more concurrent requests with the same hardware.
-
-## Enabling in Spring Boot 3.2+
-
-\`\`\`properties
-spring.threads.virtual.enabled=true
-\`\`\`
-
-That's it. Spring Boot will use virtual threads for its embedded Tomcat executor.
-
-## What Changed
-
-**Before:** Under load, our connection pool would exhaust before CPU did. Requests queued waiting for a thread. P99 latency spiked.
-
-**After:** Thread exhaustion is no longer the bottleneck. Connection pool exhaustion surfaces more clearly now — which means we fixed the actual constraint.
-
-## What Didn't Change
-
-- CPU-bound work gets no benefit. If you're doing heavy computation, virtual threads don't help.
-- You still need to be careful with thread-local state — it's carried per virtual thread, which can cause unexpected behavior with frameworks that rely on ThreadLocal.
-- Synchronized blocks still pin the virtual thread to its carrier. Use ReentrantLock instead.
-
-## Verdict
-
-Low-risk, high-upside change for I/O-heavy services. We rolled it out to all Spring Boot 3.2+ services with no incidents.`,
-  },
-  {
     id: 4,
     slug: 'the-unexpected-writing-teacher-how-crafting-ai-prompts-makes-you-a-better-communicator',
     title: 'The Unexpected Writing Teacher: How Crafting AI Prompts Makes You a Better Communicator',
@@ -88,43 +49,55 @@ Low-risk, high-upside change for I/O-heavy services. We rolled it out to all Spr
     tags: ['ai', 'prompting', 'writing'],
     description:
       'The first thing a newcomer discovers when they start prompting an AI is that vagueness is punished immediately and visibly.',
-    content: `## You Cannot Hide Behind Vagueness
+    content: `## You Can't Hide Behind Vagueness
 
-The first thing a newcomer discovers when they start prompting an AI is that vagueness is punished immediately and visibly. Ask a model to "write something about marketing" and you will receive something technically compliant and almost entirely useless. The machine has no patience for implication, no capacity to read your mood, no instinct to ask a follow-up question in the way a helpful colleague might. It takes you exactly at your word. This immediate, unsparing feedback loop forces a reckoning: *What do I actually want?* That question — deceptively simple, genuinely hard — sits at the heart of all good communication.
+When you first start using AI, one thing becomes clear pretty quickly. Being vague doesn't work. Ask a model to "write something about marketing" and you'll get a response that technically answers the question but isn't useful at all. AI doesn't pick up on hints. It doesn't read the room. It just takes your words at face value.
 
-In human conversation, ambiguity is routinely papered over by social grace. A manager who gives vague instructions is rescued by a team member willing to guess their intent. A client who can't articulate what they want is carried along by a vendor skilled at reading between the lines. AI strips all of that away. When you learn to write a tight, specific, well-scoped prompt, you are training the same cognitive muscle that produces clear briefs, precise emails, and instructions people can actually follow. The skill is not different. The teacher is just more blunt.
+That's actually useful feedback. It forces you to stop and think about what you actually want. That question, as simple as it sounds, is hard to answer well. It's also the same question behind every clear email, every useful brief, and every instruction that people can actually follow.
 
----
-
-## Context Is Not Optional
-
-Experienced prompt writers know that a request without context is a coin flip. The same question — "How should I handle this?" — will produce entirely different outputs depending on what information surrounds it. Skilled prompters learn to front-load relevant background: the audience, the purpose, the constraints, the tone, the format, the prior steps already taken. They learn, in other words, that the burden of context-setting falls on the person initiating the communication, not the one receiving it.
-
-This is a lesson that many people have never explicitly been taught, and it shows. Emails that arrive with no subject line and no explanation of why they matter. Meeting requests with no agenda. Instructions that assume the listener already knows what the speaker knows. The failure in each case is the same: the communicator forgot to model the gap between their own mental state and the recipient's. Prompt writing enforces this modeling with mechanical consistency. Every time you add a line of context to a prompt and watch the quality of the response improve, you are building an intuition that will serve you in every memo, presentation, and difficult conversation you will ever have.
+In normal conversations, we get away with being vague all the time. A teammate guesses what their manager meant. A vendor figures out what a client wants from context clues. AI removes that buffer entirely. When you learn to write a clear, specific prompt, you're building the same skill that makes you a better communicator in general. The lesson is the same. The AI is just more honest about when you've failed to learn it.
 
 ---
 
-## Constraints Are Clarifying, Not Limiting
+## Context Matters More Than You Think
 
-One of the counterintuitive discoveries that prompt writers make is that adding constraints usually improves results. Telling a model to respond in under 200 words, to use plain language, to avoid jargon, to address a skeptical audience, to structure the answer as three bullet points — each of these restrictions paradoxically produces something more useful, because they force specificity of intent. The constraints don't limit what you get; they eliminate the sprawl of things you didn't want.
+People who are new to prompting often send a request with no background and then wonder why the response misses the mark. Experienced prompt writers do the opposite. They front-load everything. Who is the audience? What's the goal? What format do you want? What have you already tried?
 
-The parallel in human communication is direct. Good editors know that a tight word count makes writers cut to the point. Good presenters know that a five-minute slot focuses a mind that a thirty-minute one lets wander. Good teachers know that a narrow question produces more useful answers than an open one. When you develop a habit of defining constraints in your prompts — and watching them work — you begin to apply the same discipline to how you communicate with people. You stop writing three-paragraph emails when one will do. You stop scheduling sixty-minute meetings for conversations that need fifteen. You learn to treat the time and attention of your audience as a resource worth respecting.
+That habit is a communication skill, not just a prompting trick. Think about how many emails arrive with no context, meetings get scheduled with no agenda, or tasks get handed off with assumptions baked in. In all these cases, the sender forgot to think about what the other person actually needs to understand the request.
 
----
-
-## Iteration Teaches You That First Drafts Lie
-
-No experienced prompt engineer sends one message and walks away. The practice is inherently iterative: send a prompt, read the response, identify what missed the mark, refine, try again. Over dozens of cycles, a subtle but important insight forms — that your *first articulation of what you want* is rarely accurate. It is the approximation you were able to produce before you fully understood what you were asking for. The real clarity emerges in revision.
-
-This maps closely onto something that experienced writers and speakers have long known: you do not fully understand your own thoughts until you have tried to express them. Writing a first draft reveals the gaps. Saying something aloud in a meeting exposes the parts you hadn't quite worked through. The difference is that with AI, the feedback loop is immediate, judgment-free, and available at two in the morning. People who prompt heavily often report a shift in how they approach communication generally — more willingness to write a rough draft before sending, more comfort treating a first explanation as a starting point rather than a finished product, more patience for the revision that turns a muddy thought into a clear one.
+Prompt writing drills this into you through repetition. Every time you add a line of context and get a better response, you build the habit of thinking from the reader's perspective. That habit carries over into how you write and speak in general.
 
 ---
 
-## Empathy for Your Audience Becomes a Practical Skill
+## Constraints Help, Not Hurt
 
-Perhaps the deepest thing prompt writing teaches is audience modeling — the ability to hold in mind a picture of who is receiving your message and what they need in order to understand it. When you prompt an AI, you are making a constant series of micro-decisions: Will the model interpret this word the way I mean it? Is this question too broad? Am I assuming knowledge it doesn't have? Have I given it enough of a frame to respond the way I want? These are, translated into human terms, the questions of a thoughtful communicator. Will my reader know this term? Is my point landing the way I intend? Am I speaking to where my audience actually is, or where I assume them to be?
+Here's something that surprised me when I started writing prompts. Adding restrictions usually makes the output better. Ask for a response under 200 words, in plain language, for a skeptical reader, structured as three bullet points, and you get something more useful than if you left it open-ended.
 
-The discipline that prompt writing cultivates — of continuously imagining the perspective of your recipient and adjusting your message accordingly — is one of the most underrated communication skills there is. It is what separates the professional who sends emails people actually read from the one whose messages get skimmed or ignored. It is what makes a teacher whose students genuinely understand different from one who mistakes familiarity for clarity. Learning to write better prompts will not, on its own, make anyone a great communicator. But it is one of the rare modern skills that rewards the same habits of mind — precision, context-awareness, iteration, and genuine empathy for whoever is on the other end of your words. In a world where those habits are increasingly rare, that is not a small thing.`,
+This isn't unique to AI. A tight word count pushes writers to get to the point. A short time slot makes presentations more focused. A specific question gets a better answer than a broad one.
+
+When you get used to applying constraints in prompts, you start doing the same thing in other areas. You stop writing long emails when a short one would do. You stop booking hour-long meetings for things that need fifteen minutes. You start treating other people's time like something worth respecting.
+
+---
+
+## First Drafts Are Never Quite Right
+
+No experienced prompt writer sends one message and calls it done. The process is iterative. Write a prompt, look at what comes back, figure out what's off, adjust, try again. After enough of those cycles, something becomes clear. Your first attempt at describing what you want is almost never accurate. It's just the best you could do before you fully understood the problem.
+
+Writers and speakers already know this. You don't really understand what you think until you try to say it. A rough draft shows you the gaps. Saying something in a meeting exposes the parts you hadn't fully worked through.
+
+With AI, the feedback loop is immediate and doesn't come with social judgment. People who prompt a lot tend to get more comfortable with iteration in general. They write drafts before sending messages. They treat first explanations as starting points, not finished products. They become more patient about getting to clarity through revision.
+
+---
+
+## You Learn to Think About Your Reader
+
+Maybe the biggest thing prompting teaches is audience awareness. Every time you write a prompt, you're constantly making small decisions. Will the model understand this the way I mean it? Is my question too vague? Am I assuming something it can't know?
+
+Those are exactly the questions a good communicator asks, just aimed at a person instead of a model. Will my reader get this? Am I being clear or just assuming they'll fill in the gaps? Am I meeting them where they are?
+
+Prompting builds this kind of thinking through constant practice. You're always adjusting your words based on what the receiver can and can't know. That habit, applied to human communication, makes a real difference. It's what separates emails people actually read from ones that get ignored.
+
+Writing better prompts won't make you a great communicator on its own. But it trains the same habits that matter. Being specific, giving context, iterating, and thinking about the person on the other end.`,
   },
   {
     id: 3,
@@ -162,5 +135,914 @@ AI tools don't have that context. But I was wrong about what they're useful for.
 ## The Adjusted Workflow
 
 I now use AI as a first pass — mechanical checks, typos, obvious issues — and treat its output as a starting point, not a conclusion. The architectural review still happens in the PR comment thread with the team.`,
+  },
+  {
+    id: 5,
+    slug: 'jira-as-todo-list-productivity',
+    title: "How I've Been Using Jira as To-Do List to Improve My Productivity",
+    date: '2021-06-06',
+    category: 'Productivity',
+    tags: ['productivity', 'jira', 'tools'],
+    mediumUrl: 'https://alexanderang24.medium.com/how-ive-been-using-jira-as-to-do-list-to-improve-my-productivity-a962c3816c8e',
+    description: 'Why you should use Jira instead of plain old to-do lists.',
+    content: `*Summarized from [this article on Medium](https://alexanderang24.medium.com/how-ive-been-using-jira-as-to-do-list-to-improve-my-productivity-a962c3816c8e).*
+
+---
+
+## Introduction
+
+I rely heavily on to-do lists to manage forgetfulness. Think of your brain's memory like a computer's RAM — writing tasks down frees up mental capacity for the actual work. My to-do list journey started in high school with pen and paper, evolved to smartphone apps during university, and eventually made its way to something more sophisticated.
+
+## Migrating from Plain To-Do Lists
+
+Rather than using basic phone applications, I adopted Jira — a professional project tracking tool — for personal productivity. While simpler solutions exist, Jira offers capabilities beyond basic task management: task descriptions, labels, effort scoring, and sprint planning with review reports.
+
+## Implementation
+
+**Setup:**
+Create an Atlassian account and set up a Kanban-based, team-managed project. Tasks are called "issues" in Jira terminology.
+
+**Task Organization:**
+- Issues live in the backlog until assigned to a sprint
+- Sprints are organized weekly (four per month)
+- Only "story" and "epic" issue types are used
+- Epics act as categorical containers
+- Story points use the Fibonacci sequence (1, 2, 3, 5, 8, 13, 20) to estimate effort
+
+**Active Sprint Management:**
+The Kanban board has three columns: "To Do," "In Progress," and "Done." Tasks flow through these stages as work progresses.
+
+**My Epic Categories:**
+1. Knowledge (reading, learning)
+2. Routine (recurring weekly/monthly tasks)
+3. Chores (household activities)
+4. Weekend (activities requiring time off)
+5. Career (professional development)
+
+**Progress Tracking:**
+Reports provide productivity insights:
+- Sprint reports show burndown charts and issue completion status
+- Velocity charts compare productivity across sprints using story point completion
+
+## Conclusion
+
+After four months of use, I noticed significant productivity improvements. While Jira's full capabilities far exceed what a personal to-do list needs, the organizational structure and progress-tracking features make it worthwhile. Find the tool that matches your own needs — this one works for me.`,
+  },
+  {
+    id: 14,
+    slug: 'spring-data-redis-usage-across-microservices',
+    title: 'Spring Data Redis Usage Across Microservices',
+    date: '2021-03-18',
+    category: 'Spring Boot',
+    tags: ['java', 'spring-boot', 'redis', 'microservices', 'caching'],
+    mediumUrl: 'https://alexanderang24.medium.com/spring-data-redis-usage-across-microservices-e2e0b292686e',
+    description: 'Demonstrate how to use Redis caching across microservices to reduce unnecessary inter-service communication.',
+    content: `*Summarized from [this article on Medium](https://alexanderang24.medium.com/spring-data-redis-usage-across-microservices-e2e0b292686e).*
+
+---
+
+## Overview
+
+This article demonstrates implementing Redis caching in a microservices architecture using Spring Data Redis. The goal: use caching to reduce unnecessary inter-service communication for repeated identical requests.
+
+## Architecture
+
+Two services:
+- **learn-redis-api** (front): External API handling incoming requests
+- **learn-redis-core** (core): Internal service managing database operations
+
+## Dependencies
+
+**Front service:**
+
+\`\`\`xml
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+  <groupId>org.projectlombok</groupId>
+  <artifactId>lombok</artifactId>
+</dependency>
+\`\`\`
+
+**Core service:**
+
+\`\`\`xml
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+  <groupId>com.h2database</groupId>
+  <artifactId>h2</artifactId>
+</dependency>
+<dependency>
+  <groupId>org.flywaydb</groupId>
+  <artifactId>flyway-core</artifactId>
+</dependency>
+\`\`\`
+
+## System Flow
+
+**Inquiry Process:**
+1. Front receives inquiry request
+2. Core validates if inquiry code exists in the database
+3. Creates new or updates existing transaction
+
+**Payment Process:**
+1. Front receives payment request
+2. Core validates existing payment records
+3. Completes transaction or returns failure response
+
+## Caching Implementation
+
+The solution uses \`@Cacheable\` on service methods, storing request parameters as cache keys. When an identical request arrives, the cached response is returned immediately — without executing the method or contacting the core service.
+
+\`\`\`java
+@Cacheable(value = "paymentCache", key = "#request.referenceId")
+public PaymentResponse processPayment(PaymentRequest request) {
+    return coreService.processPayment(request);
+}
+\`\`\`
+
+## Configuration
+
+\`\`\`properties
+spring.redis.host=localhost
+spring.redis.port=6379
+spring.cache.redis.time-to-live=5000
+\`\`\`
+
+Redis runs on localhost:6379 via Docker. TTL is set to 5 seconds for testing purposes.
+
+## Key Benefit
+
+Using cache, when the same payment request is sent again within the TTL window, the front service returns a cached response immediately — without forwarding the request to the core service. This significantly reduces latency for repeated identical requests in high-volume scenarios.`,
+  },
+  {
+    id: 6,
+    slug: 'redis-learning-from-the-bottom',
+    title: 'Redis: Learning from the Bottom',
+    date: '2021-03-18',
+    category: 'Infrastructure',
+    tags: ['redis', 'database', 'caching'],
+    mediumUrl: 'https://alexanderang24.medium.com/redis-218699aea278',
+    description: 'Learning Redis from the ground up — what it is, how it works, and why companies like Twitter, GitHub, and Pinterest rely on it.',
+    content: `*Summarized from [this article on Medium](https://alexanderang24.medium.com/redis-218699aea278).*
+
+---
+
+## What Does Redis Actually Mean?
+
+It stands for **REmote DIctionary Server**.
+
+## Introduction
+
+Redis is "an open source (BSD licensed), in-memory data structure store, used as a database, cache, and message broker." It provides numerous data structures including strings, hashes, lists, sets, sorted sets with range queries, bitmaps, hyperloglogs, geospatial indexes, and streams.
+
+Key capabilities:
+- Atomic operations on data types
+- Built-in replication and Lua scripting
+- LRU eviction and transaction support
+- On-disk persistence options
+- High availability via Redis Sentinel
+- Automatic partitioning with Redis Cluster
+
+Redis keeps its entire dataset in memory for optimal performance, which is what allows microsecond access times. Users can persist data through periodic disk dumps or append-only command logging.
+
+## How Does Redis Work?
+
+All Redis data stays in memory, eliminating disk seek delays. This architecture supports versatile data structures, high availability, geospatial capabilities, Lua scripting, transactions, on-disk persistence, and cluster functionality — making it ideal for real-time applications.
+
+## Who's Using Redis?
+
+Twitter, GitHub, Weibo, Pinterest, Snapchat, Craigslist, Digg, StackOverflow, and Flickr all use Redis in production.
+
+## Popular Redis Use Cases
+
+- Caching
+- Chat, messaging, and queues
+- Gaming leaderboards
+- Session storage
+- Rich media streaming
+- Geospatial applications
+- Machine learning
+- Real-time analytics
+
+## Why Is Redis Different?
+
+Two things set Redis apart from other databases:
+
+1. Values can contain **more complex data types** with atomic operations defined on those types — these structures are exposed directly to the programmer.
+2. Being an **in-memory yet disk-persistent** database, Redis achieves very high write and read speed, trading off against data set size being limited by available memory.`,
+  },
+  {
+    id: 7,
+    slug: 'spring-aop-logging-processing-time',
+    title: 'Menambah Log untuk Processing Time di Spring Boot Menggunakan Anotasi Spring AOP',
+    date: '2020-07-09',
+    category: 'Spring Boot',
+    tags: ['java', 'spring-boot', 'aop', 'logging'],
+    mediumUrl: 'https://medium.com/doku-insight/menambah-log-untuk-processing-time-di-spring-boot-menggunakan-anotasi-spring-aop-23af5fa5f35e',
+    description: 'Cara menambahkan log processing time di Spring Boot menggunakan custom annotation dengan Spring AOP.',
+    content: `*Summarized from [this article on Medium](https://medium.com/doku-insight/menambah-log-untuk-processing-time-di-spring-boot-menggunakan-anotasi-spring-aop-23af5fa5f35e).*
+
+---
+
+## Overview
+
+**AOP (Aspect Oriented Programming)** memungkinkan developer menambahkan fungsionalitas baru ke kode tanpa mengubah logika yang sudah ada. Artikel ini mendemonstrasikan annotation-driven AOP untuk membuat custom annotation yang mencatat waktu eksekusi method.
+
+## Dependencies
+
+\`\`\`xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-aop</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <optional>true</optional>
+</dependency>
+\`\`\`
+
+## Step 1: Buat Custom Annotation Interface
+
+\`\`\`java
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface LogExecutionTime {
+}
+\`\`\`
+
+- **@Target**: Menentukan di mana annotation dapat digunakan (method level)
+- **@Retention**: Memastikan ketersediaan pada saat JVM runtime
+
+## Step 2: Buat Aspect Class
+
+\`\`\`java
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+@Slf4j
+public class LoggingAspect {
+
+    @Around("@annotation(LogExecutionTime)")
+    public Object logExecutionTime(ProceedingJoinPoint joinPoint)
+            throws Throwable {
+        long start = System.currentTimeMillis();
+        Object proceed = joinPoint.proceed();
+        long executionTime = System.currentTimeMillis() - start;
+
+        log.info("Request processing time: " + executionTime + "ms");
+        return proceed;
+    }
+}
+\`\`\`
+
+- **@Aspect**: Menandai class sebagai aspect
+- **@Component**: Mendaftarkannya sebagai Spring bean
+- **@Slf4j**: Mengaktifkan logging
+- **@Around**: Advice yang dieksekusi sebelum dan sesudah method
+- **ProceedingJoinPoint**: Mengeksekusi method yang dianotasi
+
+## Step 3: Terapkan Annotation ke Method
+
+\`\`\`java
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class PingController {
+
+    @GetMapping(value = "/ping")
+    @LogExecutionTime
+    public void test() throws InterruptedException {
+        Thread.sleep(2000);
+    }
+}
+\`\`\`
+
+Saat endpoint dipanggil, log processing time akan otomatis muncul.
+
+## Source Code
+
+Full project tersedia di: https://github.com/alexanderang24/learn-logging-aop`,
+  },
+  {
+    id: 8,
+    slug: 'openshift-client-instalasi-dan-operasi-dasar',
+    title: 'OpenShift Client: Instalasi dan Operasi Dasar',
+    date: '2020-06-23',
+    category: 'Infrastructure',
+    tags: ['openshift', 'kubernetes', 'devops'],
+    mediumUrl: 'https://alexanderang24.medium.com/openshift-client-instalasi-dan-operasi-dasar-525d3408c13',
+    description: 'Instalasi dan operasi dasar OpenShift Client (OC) untuk mengelola aplikasi pada platform OpenShift atau Kubernetes.',
+    content: `*Summarized from [this article on Medium](https://alexanderang24.medium.com/openshift-client-instalasi-dan-operasi-dasar-525d3408c13).*
+
+---
+
+## Pengenalan
+
+OKD adalah platform untuk mengembangkan dan menjalankan aplikasi yang dikontainerisasi. Dibangun dengan fondasi Kubernetes, OKD memungkinkan aplikasi berkembang dari beberapa mesin menjadi ribuan mesin yang melayani jutaan klien.
+
+OpenShift Client membantu pengembang melakukan development, build, deploy, dan menjalankan aplikasi pada platform OpenShift atau Kubernetes melalui command line interface (CLI).
+
+**Kegunaan CLI:**
+- Mengerjakan source code project
+- Membuat script untuk operasi OKD
+- Situasi dengan keterbatasan bandwidth tanpa akses web console
+
+## Installation
+
+1. Download oc client tools dari: https://www.okd.io/download.html#oc-platforms
+2. Klik "Latest Release" di bawah "Download the latest OKD4 Release"
+3. Pilih file sesuai sistem operasi
+
+**Menentukan PATH:**
+
+\`\`\`bash
+# macOS
+echo $PATH
+
+# Windows
+path
+\`\`\`
+
+Pindahkan binary \`oc\` ke lokasi PATH. Untuk Windows, buat folder baru dan tambahkan ke Environment Variables.
+
+**Instalasi via Homebrew (macOS):**
+
+\`\`\`bash
+brew install openshift-cli
+\`\`\`
+
+**Verifikasi instalasi:**
+
+\`\`\`bash
+oc version
+\`\`\`
+
+## Operation
+
+Login ke server OKD dengan perintah dari web interface:
+
+\`\`\`bash
+oc login https://xxxxx:8080 --token=[TOKEN]
+\`\`\`
+
+**Perintah Dasar:**
+
+\`\`\`bash
+# Melihat semua project
+oc projects
+
+# Project yang sedang aktif
+oc project
+
+# Beralih ke project lain
+oc project <project_name>
+
+# Status overview project
+oc status
+
+# Menampilkan object type tertentu
+oc get <object_type>
+
+# Logout
+oc logout
+
+# Bantuan
+oc help
+oc <command> --help
+\`\`\`
+
+## Referensi
+
+- https://docs.okd.io/1.5/cli_reference/get_started_cli.html
+- https://docs.okd.io/1.5/cli_reference/basic_cli_operations.html
+- https://docs.okd.io/latest/architecture/architecture.html`,
+  },
+  {
+    id: 9,
+    slug: 'kubernetes-helm-cara-menginstal-dan-operasi-dasar',
+    title: 'Kubernetes & Helm: Cara Menginstal dan Operasi Dasar',
+    date: '2020-06-23',
+    category: 'Infrastructure',
+    tags: ['kubernetes', 'helm', 'devops'],
+    mediumUrl: 'https://medium.com/doku-insight/kubernetes-helm-cara-menginstal-dan-operasi-dasar-d926f46185f1',
+    description: 'Instalasi dan operasi dasar Kubernetes dan Helm untuk mengelola aplikasi yang dikontainerisasi.',
+    content: `*Summarized from [this article on Medium](https://medium.com/doku-insight/kubernetes-helm-cara-menginstal-dan-operasi-dasar-d926f46185f1).*
+
+---
+
+## Kubernetes
+
+### Definition
+
+Kubernetes (K8s) adalah "an open-source container orchestration engine" yang mengotomatisasi deployment, scaling, dan manajemen aplikasi yang dikontainerisasi. Dibangun dari 15 tahun pengalaman produksi Google, Kubernetes mengelompokkan container ke dalam unit logis untuk kemudahan manajemen.
+
+### Features
+
+- **Planet scale**: Memungkinkan scaling tanpa memperluas tim operasional
+- **Never outgrow**: Fleksibel dari testing lokal hingga operasi enterprise global
+- **Run anywhere**: Mendukung on-premise, hybrid, dan public cloud
+
+Dokumentasi: https://kubernetes.io/docs/home/
+
+## Helm
+
+### Definition
+
+Helm adalah "a package and operations manager for Kubernetes." Menggunakan Charts sebagai mekanisme packaging, Helm mengemas Kubernetes releases ke dalam file terkompresi (.tgz). Sebuah helm chart berisi Kubernetes objects seperti Deployments dan Services.
+
+Official charts: https://github.com/helm/charts
+
+### Installation
+
+**Install kubectl:**
+
+\`\`\`bash
+# macOS
+curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/darwin/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+
+# Verifikasi
+kubectl version --client
+\`\`\`
+
+Via Homebrew:
+
+\`\`\`bash
+brew install kubectl
+\`\`\`
+
+**Install Helm:**
+
+Download binary dari https://github.com/helm/helm/releases, lalu:
+
+\`\`\`bash
+# macOS
+mv darwin-amd64/helm /usr/local/bin/helm
+
+# Verifikasi
+helm help
+\`\`\`
+
+Via Homebrew:
+
+\`\`\`bash
+brew install helm
+\`\`\`
+
+### Initialize Helm Chart Repository
+
+\`\`\`bash
+# Tambah official chart repository
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+
+# Lihat chart yang tersedia
+helm search repo stable
+
+# Buat custom chart
+helm create chartname
+\`\`\`
+
+**Contoh values.yaml:**
+
+\`\`\`yaml
+image:
+  repository: jenkins/jenkins
+  tag: lts
+  pullPolicy: IfNotPresent
+\`\`\`
+
+**Contoh penggunaan di deployment.yaml:**
+
+\`\`\`yaml
+containers:
+  - name: {{ .Chart.Name }}
+    image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+    imagePullPolicy: {{ .Values.image.pullPolicy }}
+\`\`\`
+
+### Deploy With Helm
+
+\`\`\`bash
+# Package chart
+helm package chartname
+
+# Deploy
+helm install chartname
+\`\`\`
+
+## References
+
+- https://kubernetes.io/docs/home/
+- https://helm.sh/docs/intro/quickstart/
+- https://helm.sh/docs/topics/charts/`,
+  },
+  {
+    id: 10,
+    slug: 'redis-implementation-spring-boot',
+    title: 'Redis Implementation for Database Operations in Spring Boot',
+    date: '2019-12-06',
+    category: 'Spring Boot',
+    tags: ['java', 'spring-boot', 'redis', 'caching'],
+    mediumUrl: 'https://alexanderang24.medium.com/redis-implementation-for-database-operations-in-spring-boot-2e5bc6f7f5af',
+    description: 'How to integrate Redis caching with Spring Boot applications for improved database performance.',
+    content: `*Summarized from [this article on Medium](https://alexanderang24.medium.com/redis-implementation-for-database-operations-in-spring-boot-2e5bc6f7f5af).*
+
+---
+
+## Overview
+
+This article demonstrates how to integrate Redis caching with Spring Boot applications to reduce database load and improve response times.
+
+## Dependencies
+
+Add the following to your \`pom.xml\`:
+
+\`\`\`xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+</dependency>
+\`\`\`
+
+## Configuration
+
+Configure Redis in \`application.properties\`:
+
+\`\`\`properties
+spring.redis.host=localhost
+spring.redis.port=6379
+spring.cache.type=redis
+spring.cache.redis.time-to-live=60000
+spring.cache.redis.cache-null-values=false
+spring.cache.redis.use-key-prefix=true
+spring.cache.redis.key-prefix=My Cache:
+\`\`\`
+
+## Key Implementation Details
+
+- **Serialization**: DTOs must implement \`Serializable\` since Redis stores objects as byte arrays
+- **Cache Annotations**: Use \`@Cacheable\`, \`@CachePut\`, and \`@CacheEvict\` in the service layer
+- **TTL**: Set time-to-live in milliseconds via \`spring.cache.redis.time-to-live\`
+
+## Redis CLI Commands
+
+\`\`\`bash
+redis-cli        # connect to Redis server
+keys *           # view all cached entries
+get [cache_name] # retrieve specific cache value
+\`\`\`
+
+## GUI Tools
+
+- RedisClient (free, lightweight)
+- Redily
+- rdbtools
+
+## Key Advantage
+
+Redis enables cross-application cache sharing — since caches are stored on the Redis server rather than in application memory, cached data survives application restarts and is accessible across multiple service instances.
+
+Source code: https://github.com/alexanderang24/learn-cache-redis`,
+  },
+  {
+    id: 11,
+    slug: 'ehcache-implementation-spring-boot',
+    title: 'Ehcache Implementation for Database Operations in Spring Boot',
+    date: '2019-12-05',
+    category: 'Spring Boot',
+    tags: ['java', 'spring-boot', 'ehcache', 'caching'],
+    mediumUrl: 'https://alexanderang24.medium.com/ehcache-implementation-for-database-operations-in-spring-boot-b4d709038115',
+    description: 'How to integrate Ehcache with Spring Boot for caching database operations using TTL and TTI expiration strategies.',
+    content: `*Summarized from [this article on Medium](https://alexanderang24.medium.com/ehcache-implementation-for-database-operations-in-spring-boot-b4d709038115).*
+
+---
+
+## Overview
+
+This article demonstrates how to integrate Ehcache 3.6.2 with Spring Boot for caching database operations, using JSR-107 cache API compliance.
+
+## Dependencies
+
+\`\`\`xml
+<dependency>
+    <groupId>javax.cache</groupId>
+    <artifactId>cache-api</artifactId>
+    <version>1.1.0</version>
+</dependency>
+<dependency>
+    <groupId>org.ehcache</groupId>
+    <artifactId>ehcache</artifactId>
+    <version>3.6.2</version>
+</dependency>
+\`\`\`
+
+## Configuration (ehcache.xml)
+
+Place in the \`resources\` folder. Two cache instances are defined:
+
+**findAllCache** — uses TTL (time-to-live) expiration of 5 seconds:
+- Stores up to 2 heap entries and 10MB off-heap storage
+- Fires event listeners on creation and expiration
+
+**findByIdCache** — uses TTI (time-to-idle) expiration of 5 seconds:
+- Extends lifetime if accessed within the window
+- Supports 2 heap entries and 50MB off-heap storage
+- Listeners for multiple event types
+
+Both caches include asynchronous event logging.
+
+Reference the config in \`application.properties\`:
+
+\`\`\`properties
+spring.cache.jcache.config=classpath:ehcache.xml
+\`\`\`
+
+## Key Requirements
+
+DTOs must implement \`Serializable\` since Ehcache stores objects as byte arrays for disk persistence.
+
+## Cache Operations
+
+- **@Cacheable** — retrieves cached results or executes the method
+- **@CachePut** — updates cache entries during modifications
+- **@CacheEvict** — clears specific caches on data insertion
+- **Manual flush** — clears all cache entries
+
+## TTL vs TTI
+
+- **TTL**: Cache entry expires after a fixed duration regardless of access
+- **TTI**: Cache lifetime resets on each access — useful for session-like data
+
+Cache events are logged asynchronously, allowing observation of creation, updates, eviction, and removal operations.`,
+  },
+  {
+    id: 13,
+    slug: 'springboot-websocket-across-multiple-applications',
+    title: 'SpringBoot + WebSocket Across Multiple Applications',
+    date: '2021-04-30',
+    category: 'Spring Boot',
+    tags: ['java', 'spring-boot', 'websocket', 'microservices'],
+    mediumUrl: 'https://alexanderang24.medium.com/springboot-websocket-across-multiple-applications-117e00b1df6a',
+    description: 'How to implement WebSocket communication between two separate Spring Boot applications in a microservices architecture.',
+    content: `*Summarized from [this article on Medium](https://alexanderang24.medium.com/springboot-websocket-across-multiple-applications-117e00b1df6a).*
+
+---
+
+## Overview
+
+This guide demonstrates implementing WebSocket communication between two separate Spring Boot applications. The use case: a "back" application sending real-time notifications to a "front" application when business events occur.
+
+## Architecture
+
+Two applications:
+- **Sender** (\`learn-websocket-sender\`): Port 8090 — backend service
+- **Receiver** (\`learn-websocket-receiver\`): Port 8091 — frontend with UI
+
+## Sender Application
+
+### Dependencies
+
+\`\`\`xml
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+  <groupId>org.projectlombok</groupId>
+  <artifactId>lombok</artifactId>
+</dependency>
+\`\`\`
+
+### Controller
+
+A \`SendMessageController\` accepts messages via API and forwards them to the receiver application's \`/submit\` endpoint.
+
+## Receiver Application
+
+### Dependencies
+
+\`\`\`xml
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-websocket</artifactId>
+</dependency>
+<dependency>
+  <groupId>org.webjars</groupId>
+  <artifactId>sockjs-client</artifactId>
+  <version>1.0.2</version>
+</dependency>
+<dependency>
+  <groupId>org.webjars</groupId>
+  <artifactId>stomp-websocket</artifactId>
+  <version>2.3.3</version>
+</dependency>
+<dependency>
+  <groupId>org.webjars</groupId>
+  <artifactId>bootstrap</artifactId>
+  <version>3.3.7</version>
+</dependency>
+\`\`\`
+
+### WebSocket Configuration
+
+\`\`\`java
+configureMessageBroker() {
+  enableSimpleBroker("/topic");
+  setApplicationDestinationPrefixes("/app");
+}
+
+registerStompEndpoints {
+  addEndpoint("/websocket").withSockJS();
+}
+\`\`\`
+
+This enables a memory-based message broker and registers the SockJS endpoint.
+
+### Controller
+
+Two methods handle messages:
+- \`sendMessage()\`: Processes STOMP messages from \`/hello\`, broadcasts to \`/topic/messages\`
+- \`receiveMessage()\`: Handles HTTP requests from the sender app, broadcasts to \`/topic/messages\`
+
+### Frontend (app.js)
+
+\`\`\`javascript
+connect() {
+  var socket = new SockJS('/websocket');
+  stompClient = Stomp.over(socket);
+  stompClient.subscribe('/topic/messages', function(message) {
+    showMessage(message.body);
+  });
+}
+
+sendName() {
+  stompClient.send("/app/hello", {}, $("#name").val());
+}
+\`\`\`
+
+## Testing
+
+**Within receiver app:** Click Connect, enter a message, click Send.
+
+**Across applications:** Use curl to trigger from the sender:
+
+\`\`\`bash
+curl --location --request POST 'http://localhost:8090/submit' \\
+--header 'Content-Type: text/plain' \\
+--data-raw 'ok'
+\`\`\`
+
+Expected: "Received message: [text]" appears in the receiver UI.
+
+## Key Concepts
+
+The controller layer processes messages before broadcasting, enabling business logic and message sanitization. STOMP handles message routing; SockJS provides fallback transport for older browsers.
+
+## References
+
+- [Spring WebSocket Guide](https://spring.io/guides/gs/messaging-stomp-websocket/)
+- [GitHub: Sender Repository](https://github.com/alexanderang24/learn-websocket-sender)
+- [GitHub: Receiver Repository](https://github.com/alexanderang24/learn-websocket-receiver)`,
+  },
+  {
+    id: 12,
+    slug: 'spring-boot-cache-implementation',
+    title: 'Spring Boot Cache Implementation for Database Operations',
+    date: '2019-12-02',
+    category: 'Spring Boot',
+    tags: ['java', 'spring-boot', 'caching'],
+    mediumUrl: 'https://alexanderang24.medium.com/spring-boot-cache-implementation-for-database-operations-cf846d6d8e3c',
+    description: 'Cache implementation using the built-in cache abstraction in Spring Boot to reduce database hits.',
+    content: `*Summarized from [this article on Medium](https://alexanderang24.medium.com/spring-boot-cache-implementation-for-database-operations-cf846d6d8e3c).*
+
+---
+
+## Overview
+
+This article explains how to implement caching in Spring Boot applications to optimize database operations. Caching reduces database hits by storing frequently accessed data in memory.
+
+## Getting Started
+
+### Maven Dependency
+
+\`\`\`xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+\`\`\`
+
+### Enable Caching
+
+Add \`@EnableCaching\` to any configuration class:
+
+\`\`\`java
+@EnableCaching
+public class DemoApplication { }
+\`\`\`
+
+## Core Caching Annotations
+
+### @Cacheable
+
+Enables method-level caching. Returns cached results if available, otherwise executes the method and caches the result.
+
+\`\`\`java
+@Cacheable("cacheName")
+@Cacheable({"cache1", "cache2"})
+\`\`\`
+
+### @CacheEvict
+
+Removes cache entries. Use \`allEntries=true\` to clear all entries in a cache. Unlike \`@Cacheable\`, this always executes the method.
+
+\`\`\`java
+@CacheEvict(value="cacheName", allEntries=true)
+\`\`\`
+
+### @CachePut
+
+Always runs the method and updates the cache with the result.
+
+\`\`\`java
+@CachePut(value="cacheName")
+\`\`\`
+
+### @Caching
+
+Applies multiple cache annotations of the same type to a single method:
+
+\`\`\`java
+@Caching(evict = {
+    @CacheEvict("addresses"),
+    @CacheEvict(value="directory", key="#customer.name")
+})
+\`\`\`
+
+### @CacheConfig
+
+Sets default cache configuration at the class level:
+
+\`\`\`java
+@CacheConfig(cacheNames={"cacheName"})
+\`\`\`
+
+## Conditional Caching
+
+Three conditional parameters using SpEL expressions:
+
+\`\`\`java
+@Cacheable(value="addresses", key="#customer.name")
+@CacheEvict(value="cacheName", condition="#customer.name=='Herianto'")
+@CachePut(value="addresses", unless="#result.length()<64")
+\`\`\`
+
+- **condition**: Evaluated before execution — caches only if true
+- **key**: Custom cache key generation
+- **unless**: Evaluated after execution — prevents caching if true
+
+## Debugging
+
+Enable cache logging with:
+
+\`\`\`properties
+logging.level.org.springframework.cache=TRACE
+\`\`\`
+
+Source code: https://github.com/alexanderang24/learn-spring-boot-cache`,
   },
 ]

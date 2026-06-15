@@ -3,10 +3,18 @@ import hljs from 'highlight.js/lib/core'
 import java from 'highlight.js/lib/languages/java'
 import javascript from 'highlight.js/lib/languages/javascript'
 import properties from 'highlight.js/lib/languages/properties'
+import xml from 'highlight.js/lib/languages/xml'
+import bash from 'highlight.js/lib/languages/bash'
+import yaml from 'highlight.js/lib/languages/yaml'
+import plaintext from 'highlight.js/lib/languages/plaintext'
 
 hljs.registerLanguage('java', java)
 hljs.registerLanguage('javascript', javascript)
 hljs.registerLanguage('properties', properties)
+hljs.registerLanguage('xml', xml)
+hljs.registerLanguage('bash', bash)
+hljs.registerLanguage('yaml', yaml)
+hljs.registerLanguage('plaintext', plaintext)
 
 function postProcess(html) {
   // Wrap string literals inside hljs-meta (annotation args) as hljs-string

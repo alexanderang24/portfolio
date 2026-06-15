@@ -14,6 +14,12 @@
           </div>
         </div>
         <div class="prose" v-html="renderedContent" />
+
+        <div v-if="post.mediumUrl" class="medium-footer">
+          <a :href="post.mediumUrl" target="_blank" rel="noopener">
+            Read the full article on Medium →
+          </a>
+        </div>
       </template>
 
       <div v-else class="not-found">
@@ -114,6 +120,23 @@ function formatDate(iso) {
 .tag {
   font-size: 0.75rem;
   color: var(--color-text-muted);
+}
+
+.medium-footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.medium-footer a {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: opacity var(--transition-base);
+}
+
+.medium-footer a:hover {
+  opacity: 0.75;
 }
 
 .not-found {
