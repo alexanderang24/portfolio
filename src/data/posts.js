@@ -1,5 +1,426 @@
 export const posts = [
   {
+    id: 16,
+    slug: 'build-your-own-ai-personal-assistant-with-claude',
+    title: 'Build Your Own AI Personal Assistant with Claude',
+    date: '2026-06-16',
+    category: 'AI Engineering',
+    tags: ['ai', 'python', 'claude', 'tutorial'],
+    description:
+      'A step-by-step guide to building a personal AI assistant using Python and the Anthropic Claude API — with multi-turn memory, streaming, tools, and persistent history across sessions.',
+    content: `## What We're Building
+
+By the end of this tutorial, you'll have a working AI personal assistant that can:
+
+- Hold multi-turn conversations (it **remembers** what you said earlier)
+- Use **tools** like checking the weather, setting reminders, and searching the web
+- Stream responses in real time so it feels snappy and alive
+- Maintain a **persistent memory** of your preferences across sessions
+
+\`\`\`
+┌─────────────────────────────────────────────────┐
+│                                                 │
+│   You ──► Personal Assistant ──► Claude API     │
+│            │                          │         │
+│            ├── Memory Store           │         │
+│            ├── Tool Runner            │         │
+│            └── Streaming Output ◄─────┘         │
+│                                                 │
+└─────────────────────────────────────────────────┘
+\`\`\`
+
+---
+
+## Prerequisites
+
+- Python 3.10+
+- An [Anthropic API key](https://console.anthropic.com) (free to sign up)
+- Basic Python knowledge
+
+---
+
+## Step 1 — Installation
+
+\`\`\`bash
+pip install anthropic python-dotenv
+\`\`\`
+
+Create a \`.env\` file in your project folder:
+
+\`\`\`
+ANTHROPIC_API_KEY=your-api-key-here
+\`\`\`
+
+---
+
+## Step 2 — Your First Conversation
+
+Let's start simple — a single turn with Claude:
+
+\`\`\`python
+import anthropic
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = anthropic.Anthropic()
+
+response = client.messages.create(
+    model="claude-opus-4-8",
+    max_tokens=1024,
+    messages=[
+        {"role": "user", "content": "Hi! What can you help me with today?"}
+    ]
+)
+
+print(response.content[0].text)
+\`\`\`
+
+Run it — Claude will introduce itself. But this is just a one-shot exchange. A real assistant needs to **remember** the conversation.
+
+---
+
+## Step 3 — Add Memory (Multi-Turn Conversations)
+
+The Claude API is stateless — you must send the full conversation history every time. Here's how to manage that cleanly:
+
+\`\`\`python
+import anthropic
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = anthropic.Anthropic()
+
+SYSTEM_PROMPT = """You are a helpful personal assistant named Aria.
+You are concise, friendly, and proactive. You remember details the user
+shares and refer back to them naturally in conversation."""
+
+class Assistant:
+    def __init__(self):
+        self.history = []
+
+    def chat(self, user_message: str) -> str:
+        self.history.append({
+            "role": "user",
+            "content": user_message
+        })
+
+        response = client.messages.create(
+            model="claude-opus-4-8",
+            max_tokens=1024,
+            system=SYSTEM_PROMPT,
+            messages=self.history
+        )
+
+        assistant_reply = response.content[0].text
+
+        self.history.append({
+            "role": "assistant",
+            "content": assistant_reply
+        })
+
+        return assistant_reply
+
+
+# Try it out
+assistant = Assistant()
+
+print("Aria:", assistant.chat("My name is Alex and I love hiking."))
+print("Aria:", assistant.chat("What do you know about me?"))
+# Aria remembers your name and hobby!
+\`\`\`
+
+---
+
+## Step 4 — Add Streaming (Real-Time Output)
+
+Waiting for a full response before printing anything feels slow. Streaming fixes that — text appears word by word, just like ChatGPT:
+
+\`\`\`python
+def chat_streaming(self, user_message: str) -> str:
+    self.history.append({
+        "role": "user",
+        "content": user_message
+    })
+
+    full_reply = ""
+
+    with client.messages.stream(
+        model="claude-opus-4-8",
+        max_tokens=1024,
+        system=SYSTEM_PROMPT,
+        messages=self.history
+    ) as stream:
+        print("Aria: ", end="", flush=True)
+        for text in stream.text_stream:
+            print(text, end="", flush=True)
+            full_reply += text
+        print()  # newline after response
+
+    self.history.append({
+        "role": "assistant",
+        "content": full_reply
+    })
+
+    return full_reply
+\`\`\`
+
+---
+
+## Step 5 — Give Your Assistant Tools
+
+This is where it gets exciting. Tools let Claude take real actions — check weather, set reminders, do math, or call any API you define.
+
+\`\`\`
+User: "What's the weather in Tokyo?"
+      │
+      ▼
+  Claude decides to use the get_weather tool
+      │
+      ▼
+  Your code runs get_weather("Tokyo")
+      │
+      ▼
+  Result returned to Claude
+      │
+      ▼
+  Claude gives a natural language answer
+\`\`\`
+
+Here's how to implement this with the tool runner:
+
+\`\`\`python
+import anthropic
+from anthropic import beta_tool
+from dotenv import load_dotenv
+from datetime import datetime
+
+load_dotenv()
+client = anthropic.Anthropic()
+
+@beta_tool
+def get_weather(city: str) -> str:
+    """Get the current weather for a city.
+
+    Args:
+        city: The city name to get weather for.
+    """
+    mock_weather = {
+        "Tokyo": "22°C, partly cloudy",
+        "New York": "18°C, sunny",
+        "London": "15°C, rainy",
+    }
+    return mock_weather.get(city, f"Weather data unavailable for {city}")
+
+
+@beta_tool
+def set_reminder(task: str, time: str) -> str:
+    """Set a reminder for a task at a specific time.
+
+    Args:
+        task: What to be reminded about.
+        time: When to set the reminder (e.g. '3pm', 'tomorrow morning').
+    """
+    return f"✅ Reminder set: '{task}' at {time}"
+
+
+@beta_tool
+def get_current_time() -> str:
+    """Get the current date and time."""
+    return datetime.now().strftime("%A, %B %d, %Y at %I:%M %p")
+
+
+class AssistantWithTools:
+    def __init__(self):
+        self.history = []
+        self.tools = [get_weather, set_reminder, get_current_time]
+
+    def chat(self, user_message: str) -> str:
+        self.history.append({
+            "role": "user",
+            "content": user_message
+        })
+
+        runner = client.beta.messages.tool_runner(
+            model="claude-opus-4-8",
+            max_tokens=1024,
+            system=SYSTEM_PROMPT,
+            tools=self.tools,
+            messages=self.history
+        )
+
+        final_reply = ""
+        for message in runner:
+            for block in message.content:
+                if block.type == "text":
+                    final_reply = block.text
+
+        self.history.append({
+            "role": "assistant",
+            "content": final_reply
+        })
+
+        return final_reply
+\`\`\`
+
+---
+
+## Step 6 — Persistent Memory Across Sessions
+
+A real personal assistant should remember you even after you restart the app. Save conversation history to a JSON file:
+
+\`\`\`python
+import json
+import os
+
+class PersistentAssistant(AssistantWithTools):
+    def __init__(self, memory_file="assistant_memory.json"):
+        super().__init__()
+        self.memory_file = memory_file
+        self.load_memory()
+
+    def load_memory(self):
+        if os.path.exists(self.memory_file):
+            with open(self.memory_file, "r") as f:
+                data = json.load(f)
+                self.history = data.get("history", [])[-40:]
+            print(f"📂 Loaded {len(self.history)//2} previous exchanges.")
+
+    def save_memory(self):
+        with open(self.memory_file, "w") as f:
+            json.dump({"history": self.history}, f, indent=2)
+
+    def chat(self, user_message: str) -> str:
+        reply = super().chat(user_message)
+        self.save_memory()
+        return reply
+\`\`\`
+
+---
+
+## Step 7 — Put It All Together
+
+Here's the complete interactive loop:
+
+\`\`\`python
+def main():
+    print("╔══════════════════════════════════╗")
+    print("║   🤖  Aria — Your AI Assistant   ║")
+    print("║   Type 'quit' to exit            ║")
+    print("╚══════════════════════════════════╝\\n")
+
+    assistant = PersistentAssistant()
+
+    while True:
+        try:
+            user_input = input("You: ").strip()
+        except (KeyboardInterrupt, EOFError):
+            print("\\nAria: Goodbye! Talk soon. 👋")
+            break
+
+        if not user_input:
+            continue
+
+        if user_input.lower() in ("quit", "exit", "bye"):
+            print("Aria: Goodbye! Have a great day! 👋")
+            break
+
+        response = assistant.chat(user_input)
+        print(f"Aria: {response}\\n")
+
+
+if __name__ == "__main__":
+    main()
+\`\`\`
+
+---
+
+## Running the Assistant
+
+\`\`\`bash
+python assistant.py
+\`\`\`
+
+**Example conversation:**
+
+\`\`\`
+You: My name is Alex. I'm in Tokyo for a week.
+Aria: Nice to meet you, Alex! Tokyo is amazing — what brings you there?
+
+You: What's the weather like here?
+Aria: In Tokyo right now it's 22°C and partly cloudy —
+      great weather for exploring the city!
+
+You: Remind me to visit Shibuya at 6pm
+Aria: ✅ Done! I've set a reminder: 'Visit Shibuya' at 6pm.
+      Enjoy the famous crossing!
+
+You: What do you know about me?
+Aria: You're Alex, currently in Tokyo for a week.
+      You've got a Shibuya reminder set for 6pm today!
+\`\`\`
+
+---
+
+## Project Structure
+
+\`\`\`
+my-assistant/
+├── .env                    ← Your API key (never commit this!)
+├── .gitignore
+├── assistant.py            ← Main app
+├── assistant_memory.json   ← Auto-created on first run
+└── requirements.txt
+\`\`\`
+
+**requirements.txt:**
+
+\`\`\`
+anthropic>=0.92.0
+python-dotenv>=1.0.0
+\`\`\`
+
+---
+
+## What to Build Next
+
+| Feature | How |
+|---|---|
+| Voice input/output | Add \`speechrecognition\` + \`pyttsx3\` |
+| Web search | Call the Google or Brave Search API inside a tool |
+| Email drafting | Add a \`draft_email\` tool using Gmail API |
+| Calendar integration | Connect to Google Calendar via their Python SDK |
+| Custom personality | Expand the \`SYSTEM_PROMPT\` with your preferences |
+
+---
+
+## Key Concepts Recap
+
+\`\`\`
+┌─────────────────────────────────────────────────────┐
+│  CONCEPT          │  WHAT IT DOES                   │
+├───────────────────┼─────────────────────────────────┤
+│  System Prompt    │  Gives your assistant a name    │
+│                   │  and personality                │
+├───────────────────┼─────────────────────────────────┤
+│  Message History  │  Enables multi-turn memory      │
+├───────────────────┼─────────────────────────────────┤
+│  Streaming        │  Real-time word-by-word output  │
+├───────────────────┼─────────────────────────────────┤
+│  Tool Runner      │  Lets Claude take real actions  │
+├───────────────────┼─────────────────────────────────┤
+│  JSON Storage     │  Memory persists across restarts│
+└───────────────────┴─────────────────────────────────┘
+\`\`\`
+
+The Claude API handles the hard AI reasoning — your job is to wire together the memory, tools, and interface around it. That's the whole pattern behind every AI assistant you've ever used.
+
+---
+
+*Happy building! The full source code for this tutorial is self-contained in the snippets above — copy each section in order and you'll have a working assistant in under 30 minutes.*`,
+  },
+  {
     id: 1,
     slug: 'building-reliable-payment-systems',
     title: 'Building Reliable Payment Systems',
@@ -937,6 +1358,372 @@ The controller layer processes messages before broadcasting, enabling business l
 - [Spring WebSocket Guide](https://spring.io/guides/gs/messaging-stomp-websocket/)
 - [GitHub: Sender Repository](https://github.com/alexanderang24/learn-websocket-sender)
 - [GitHub: Receiver Repository](https://github.com/alexanderang24/learn-websocket-receiver)`,
+  },
+  {
+    id: 15,
+    slug: 'getting-started-with-prometheus-monitoring-in-spring-boot',
+    title: 'Getting Started with Prometheus Monitoring in Spring Boot',
+    date: '2026-06-16',
+    category: 'Backend Engineering',
+    tags: ['java', 'spring-boot', 'prometheus', 'monitoring'],
+    description: 'A beginner-friendly guide to setting up Prometheus metrics in a Spring Boot application — from dependency setup to writing custom metrics and testing them.',
+    content: `## What Is Prometheus?
+
+Prometheus is an open-source monitoring and alerting toolkit. It collects metrics from your application by **pulling** data from a metrics endpoint at regular intervals. Think of it like a health checkup — Prometheus visits your app every few seconds and asks "how are you doing?" then stores the answer.
+
+In the context of Spring Boot, Prometheus works hand-in-hand with **Spring Boot Actuator** and **Micrometer** — a metrics library that acts as a bridge between your application and monitoring systems like Prometheus.
+
+---
+
+## The Big Picture
+
+Here's how the pieces connect:
+
+1. **Your Spring Boot app** exposes a \`/actuator/prometheus\` endpoint
+2. **Prometheus** scrapes that endpoint on a schedule (e.g., every 15 seconds)
+3. **Grafana** (optional) reads from Prometheus to display dashboards
+
+No code changes are needed on your app once the endpoint is set up — Prometheus does the pulling automatically.
+
+---
+
+## Step 1: Add Dependencies
+
+Add these to your \`pom.xml\`:
+
+\`\`\`xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-registry-prometheus</artifactId>
+</dependency>
+\`\`\`
+
+- **spring-boot-starter-actuator**: Gives your app built-in health and metrics endpoints
+- **micrometer-registry-prometheus**: Formats those metrics in the format Prometheus understands
+
+---
+
+## Step 2: Configure application.properties
+
+\`\`\`properties
+management.endpoints.web.exposure.include=health,info,prometheus,metrics
+management.endpoint.prometheus.enabled=true
+\`\`\`
+
+Restart your app and visit \`http://localhost:8080/actuator/prometheus\`. You'll see a wall of text — that's your metrics in Prometheus format.
+
+---
+
+## Step 3: What You Get for Free
+
+Spring Boot Actuator auto-generates dozens of useful metrics out of the box. No extra code needed.
+
+| Metric | What it measures |
+|--------|-----------------|
+| \`jvm_memory_used_bytes\` | JVM heap and non-heap memory |
+| \`http_server_requests_seconds\` | Response times per endpoint |
+| \`jvm_gc_pause_seconds\` | Garbage collection duration |
+| \`process_cpu_usage\` | CPU usage of the JVM process |
+| \`hikaricp_connections_active\` | Active database connections |
+
+---
+
+## Step 4: Custom Metrics
+
+The real power comes from tracking business-level metrics. Micrometer provides four main types.
+
+### Counter — counting events
+
+Use a \`Counter\` when you want to track how many times something happened. It only goes up.
+
+\`\`\`java
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.stereotype.Service;
+
+@Service
+public class OrderService {
+
+    private final Counter orderCounter;
+
+    public OrderService(MeterRegistry registry) {
+        this.orderCounter = Counter.builder("orders.created.total")
+                .description("Total number of orders created")
+                .tag("status", "success")
+                .register(registry);
+    }
+
+    public void createOrder(Order order) {
+        // your business logic here
+        orderCounter.increment();
+    }
+}
+\`\`\`
+
+In Prometheus, you'd query this as \`orders_created_total\`. Notice that dots become underscores — that's how Prometheus names work.
+
+---
+
+### Gauge — tracking a current value
+
+Use a \`Gauge\` for values that go up and down, like queue size or number of active sessions.
+
+\`\`\`java
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.stereotype.Service;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Service
+public class QueueService {
+
+    private final AtomicInteger queueSize = new AtomicInteger(0);
+
+    public QueueService(MeterRegistry registry) {
+        Gauge.builder("queue.size", queueSize, AtomicInteger::get)
+                .description("Current number of items in the queue")
+                .register(registry);
+    }
+
+    public void addToQueue(String item) {
+        queueSize.incrementAndGet();
+    }
+
+    public void removeFromQueue() {
+        queueSize.decrementAndGet();
+    }
+}
+\`\`\`
+
+---
+
+### Timer — measuring duration
+
+Use a \`Timer\` to measure how long operations take.
+
+\`\`\`java
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import org.springframework.stereotype.Service;
+
+@Service
+public class PaymentService {
+
+    private final Timer paymentTimer;
+
+    public PaymentService(MeterRegistry registry) {
+        this.paymentTimer = Timer.builder("payment.processing.duration")
+                .description("Time taken to process a payment")
+                .register(registry);
+    }
+
+    public PaymentResult processPayment(PaymentRequest request) {
+        return paymentTimer.record(() -> doProcess(request));
+    }
+}
+\`\`\`
+
+---
+
+### Using @Timed Annotation (Simpler)
+
+For REST endpoints, the \`@Timed\` annotation is cleaner than wiring a \`Timer\` manually:
+
+\`\`\`java
+import io.micrometer.core.annotation.Timed;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ProductController {
+
+    @GetMapping("/products")
+    @Timed(value = "products.list.duration", description = "Time to fetch product list")
+    public List<Product> getProducts() {
+        return productService.findAll();
+    }
+}
+\`\`\`
+
+\`@Timed\` requires a \`TimedAspect\` bean. Add this to a \`@Configuration\` class:
+
+\`\`\`java
+import io.micrometer.core.aop.TimedAspect;
+import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class MetricsConfig {
+
+    @Bean
+    public TimedAspect timedAspect(MeterRegistry registry) {
+        return new TimedAspect(registry);
+    }
+}
+\`\`\`
+
+---
+
+## Step 5: Testing Your Metrics
+
+### Test 1: Verify the endpoint is reachable
+
+\`\`\`java
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+class PrometheusEndpointTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    void prometheusEndpointReturnsMetrics() throws Exception {
+        mockMvc.perform(get("/actuator/prometheus"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/plain;version=0.0.4;charset=utf-8"));
+    }
+
+    @Test
+    void prometheusEndpointContainsJvmMetrics() throws Exception {
+        mockMvc.perform(get("/actuator/prometheus"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(
+                        org.hamcrest.Matchers.containsString("jvm_memory_used_bytes")));
+    }
+}
+\`\`\`
+
+### Test 2: Verify your custom counter increments
+
+The key is \`SimpleMeterRegistry\` — an in-memory registry that's perfect for unit tests. No Prometheus server needed.
+
+\`\`\`java
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class OrderServiceTest {
+
+    @Test
+    void counterIncrementsWhenOrderIsCreated() {
+        MeterRegistry registry = new SimpleMeterRegistry();
+        OrderService orderService = new OrderService(registry);
+
+        orderService.createOrder(new Order("product-1", 2));
+        orderService.createOrder(new Order("product-2", 1));
+
+        Counter counter = registry.find("orders.created.total")
+                .tag("status", "success")
+                .counter();
+
+        assertThat(counter).isNotNull();
+        assertThat(counter.count()).isEqualTo(2.0);
+    }
+}
+\`\`\`
+
+### Test 3: Verify timer records duration
+
+\`\`\`java
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class PaymentServiceTest {
+
+    @Test
+    void timerRecordsPaymentDuration() {
+        MeterRegistry registry = new SimpleMeterRegistry();
+        PaymentService paymentService = new PaymentService(registry);
+
+        paymentService.processPayment(new PaymentRequest("order-123", 50000));
+
+        Timer timer = registry.find("payment.processing.duration").timer();
+
+        assertThat(timer).isNotNull();
+        assertThat(timer.count()).isEqualTo(1);
+        assertThat(timer.totalTime(TimeUnit.MILLISECONDS)).isGreaterThan(0);
+    }
+}
+\`\`\`
+
+---
+
+## Running Prometheus Locally with Docker
+
+Create a \`prometheus.yml\` config file in your project root:
+
+\`\`\`yaml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'spring-boot-app'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+\`\`\`
+
+Then start Prometheus:
+
+\`\`\`bash
+docker run -p 9090:9090 \\
+  -v ./prometheus.yml:/etc/prometheus/prometheus.yml \\
+  prom/prometheus
+\`\`\`
+
+Open \`http://localhost:9090\` and try these queries in the search box:
+
+- \`jvm_memory_used_bytes\` — JVM memory over time
+- \`http_server_requests_seconds_count\` — total request count per endpoint
+- \`orders_created_total\` — your custom business counter
+
+---
+
+## Quick Reference: When to Use Which Metric Type
+
+| Type | Use when | Example |
+|------|----------|---------|
+| Counter | Something only increases | Total orders, errors, logins |
+| Gauge | A current snapshot that fluctuates | Queue depth, active sessions |
+| Timer | Duration of an operation | API latency, DB query time |
+| DistributionSummary | Distribution of a value | Payload size, batch size |
+
+---
+
+## Summary
+
+1. Add \`spring-boot-starter-actuator\` and \`micrometer-registry-prometheus\` to \`pom.xml\`
+2. Expose the \`/actuator/prometheus\` endpoint in \`application.properties\`
+3. Get JVM, HTTP, and DB metrics for free — no extra code
+4. Add \`Counter\`, \`Gauge\`, and \`Timer\` via \`MeterRegistry\` for business-level metrics
+5. Test metrics in isolation using \`SimpleMeterRegistry\`
+6. Point Prometheus at your endpoint and start querying
+
+Prometheus gives you visibility into what your application is actually doing in production — and Spring Boot makes it surprisingly easy to get started.`,
   },
   {
     id: 12,
