@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const isDark = ref(true)
+const isDark = ref(false)
 
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', isDark.value ? 'dark' : 'light')

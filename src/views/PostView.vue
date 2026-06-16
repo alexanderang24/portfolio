@@ -16,7 +16,7 @@
         <div class="prose" v-html="renderedContent" />
 
         <div v-if="post.mediumUrl" class="medium-footer">
-          <a :href="post.mediumUrl" target="_blank" rel="noopener">
+          <a :href="post.mediumUrl" target="_blank" rel="noopener noreferrer">
             Read the full article on Medium →
           </a>
         </div>
@@ -33,6 +33,7 @@
 <script setup>
 import { computed, watchEffect, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
+import DOMPurify from 'dompurify'
 import { marked } from '../utils/markedWithHljs.js'
 import { posts } from '../data/posts.js'
 import { readingTime } from '../utils/readingTime.js'
@@ -42,7 +43,7 @@ const route = useRoute()
 const post = computed(() => posts.find(p => p.slug === route.params.slug) ?? null)
 
 const renderedContent = computed(() =>
-  post.value ? marked(post.value.content) : ''
+  post.value ? DOMPurify.sanitize(marked(post.value.content)) : ''
 )
 
 const postReadingTime = computed(() =>

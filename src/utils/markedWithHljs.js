@@ -1,4 +1,4 @@
-import { marked } from 'marked'
+import { Marked } from 'marked'
 import hljs from 'highlight.js/lib/core'
 import java from 'highlight.js/lib/languages/java'
 import javascript from 'highlight.js/lib/languages/javascript'
@@ -7,6 +7,7 @@ import xml from 'highlight.js/lib/languages/xml'
 import bash from 'highlight.js/lib/languages/bash'
 import yaml from 'highlight.js/lib/languages/yaml'
 import plaintext from 'highlight.js/lib/languages/plaintext'
+import python from 'highlight.js/lib/languages/python'
 
 hljs.registerLanguage('java', java)
 hljs.registerLanguage('javascript', javascript)
@@ -15,6 +16,7 @@ hljs.registerLanguage('xml', xml)
 hljs.registerLanguage('bash', bash)
 hljs.registerLanguage('yaml', yaml)
 hljs.registerLanguage('plaintext', plaintext)
+hljs.registerLanguage('python', python)
 
 function postProcess(html) {
   // Wrap string literals inside hljs-meta (annotation args) as hljs-string
@@ -25,15 +27,20 @@ function postProcess(html) {
   )
 
   // Tag identifiers immediately before a dot call as hljs-field (e.g. idempotencyService.)
-  html = html.replace(
-    /(?<=>|^|\s|[({,])([a-z][a-zA-Z0-9_]*)(?=\.)/g,
-    '<span class="hljs-field">$1</span>'
-  )
+  // Only operates on bare text nodes to avoid corrupting content inside existing spans (comments, strings, etc.)
+  html = html.replace(/(<span[^>]*>[^<]*<\/span>)|([^<]+)/g, (_, span, text) => {
+    if (span !== undefined) return span
+    return text.replace(
+      /(?<![a-zA-Z0-9_$])([a-z][a-zA-Z0-9_]*)(?=\.)/g,
+      '<span class="hljs-field">$1</span>'
+    )
+  })
 
   return html
 }
 
-marked.use({
+const _instance = new Marked()
+_instance.use({
   renderer: {
     code({ text, lang }) {
       const language = hljs.getLanguage(lang) ? lang : 'plaintext'
@@ -43,4 +50,4 @@ marked.use({
   }
 })
 
-export { marked }
+export const marked = (text) => _instance.parse(text)
