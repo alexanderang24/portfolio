@@ -3,17 +3,22 @@
 <template>
   <section id="about">
     <div class="container">
-      <h2 class="section-heading">About</h2>
+      <h2 class="section-heading">About Me</h2>
       <div class="about-body" v-appear>
         <p>
-          I'm a <span class="highlight">Software Engineer</span> based in Jakarta, Indonesia, with over <span class="highlight">7 years</span> of professional
-          experience in enterprise backend development — primarily in the <span class="highlight">Financial Services</span> and
-          <span class="highlight">Payment Gateway</span> sectors.
+          I'm a <span class="highlight">Software Engineer</span> based in Jakarta, Indonesia, with
+          <span class="highlight">7+ years</span> of experience in enterprise backend development —
+          specialising in <span class="highlight">financial services</span> and
+          <span class="highlight">payment infrastructure</span>.
         </p>
         <p>
-          At DOKU, I architect and maintain high-throughput payment systems built on <span class="highlight">Java and
-          Spring Boot</span> — focusing on transaction reliability, data integrity, and scalable merchant
-          workflows.
+          At DOKU, I've built and maintained the systems behind <span class="highlight">KirimDOKU</span>
+          (fund transfers across 9+ banks), <span class="highlight">Refund Service</span>, and
+          <span class="highlight">QRIS merchant onboarding</span> — contributing to a platform that
+          processes a total of <span class="highlight">360M+ transactions</span> and
+          <span class="highlight">330T+ IDR</span> in volume, serving
+          <span class="highlight">100+ merchants</span> and <span class="highlight">4M+ users</span>
+          across 45+ payment methods.
         </p>
         <p>
           Outside of work, I've been expanding into frontend development with Vue.js, exploring

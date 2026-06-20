@@ -6,7 +6,7 @@
         Available for new roles
       </div>
       <p class="eyebrow"><span class="highlight">Software Engineer</span> · 7+ Years</p>
-      <h1 class="hero-heading">Building payment systems that don't fail.</h1>
+      <h1 class="hero-heading">Crafting reliable APIs for the payments industry.</h1>
       <p class="hero-sub">
         Hi, I'm Alexander. I specialise in enterprise backend development using Java (Spring Boot)
         and high-throughput payment architectures.
@@ -22,8 +22,9 @@
         </div>
       </div>
       <div class="hero-links">
-        <a href="#" @click.prevent="scrollTo('projects')">View my work ↓</a>
+        <a href="#" @click.prevent="scrollTo('skills')">Check my skills ↓</a>
         <a href="#" @click.prevent="scrollTo('contact')">Get in touch ↓</a>
+        <RouterLink to="/projects">Check my projects →</RouterLink>
         <RouterLink to="/writing">Check my writings →</RouterLink>
       </div>
     </div>

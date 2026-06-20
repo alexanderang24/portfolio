@@ -3,7 +3,7 @@ export const projects = [
     id: 1,
     title: 'KirimDOKU – Fund Transfer Platform',
     description:
-      'REST API platform powering domestic disbursement, incoming/outgoing remittances, bank account validation, and bill payments for 150+ merchants. Integrated 9+ Indonesian banks (BCA, BNI, BRI, Mandiri, OVO, and others) via SNAP-compliant and custom connectors, alongside internal admin and merchant-facing web portals.',
+      'REST API platform powering domestic disbursement, incoming/outgoing remittances, bank account validation, and bill payments for 100+ merchants. Integrated 9+ Indonesian banks (BCA, BNI, BRI, Mandiri, OVO, and others) via SNAP-compliant and custom connectors, alongside internal admin and merchant-facing web portals.',
     tech: ['Java', 'Spring Boot', 'Spring Webflux', 'R2DBC', 'PostgreSQL', 'Redis', 'Kafka', 'Alicloud OSS'],
     githubUrl: null,
     liveUrl: null,

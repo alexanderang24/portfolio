@@ -3,12 +3,9 @@
     <div class="navbar-inner">
       <a class="navbar-logo" href="#" @click.prevent="scrollToTop">Alexander Ang</a>
       <ul class="navbar-links" :class="{ open: menuOpen }">
-        <li>
-          <RouterLink to="/writing" @click="menuOpen = false">Writing</RouterLink>
-        </li>
-        <li><a href="#" @click.prevent="scrollTo('about')" :class="{ active: onHome && activeId === 'about' }">About</a></li>
+        <li><RouterLink to="/projects" @click="menuOpen = false">Projects</RouterLink></li>
+        <li><RouterLink to="/writing" @click="menuOpen = false">Writing</RouterLink></li>
         <li><a href="#" @click.prevent="scrollTo('experience')" :class="{ active: onHome && activeId === 'experience' }">Experience</a></li>
-        <li><a href="#" @click.prevent="scrollTo('projects')" :class="{ active: onHome && activeId === 'projects' }">Projects</a></li>
         <li><a href="#" @click.prevent="scrollTo('skills')" :class="{ active: onHome && activeId === 'skills' }">Skills</a></li>
         <li><a href="#" @click.prevent="scrollTo('contact')" :class="{ active: onHome && activeId === 'contact' }">Contact</a></li>
       </ul>

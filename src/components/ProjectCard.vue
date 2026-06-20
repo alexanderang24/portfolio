@@ -67,7 +67,7 @@ defineProps({
 }
 
 .card-links a {
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   text-decoration: none;
   display: flex;
   align-items: center;
