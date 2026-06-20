@@ -29,7 +29,7 @@ import { skills } from '../data/skills.js'
   font-variant: small-caps;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   margin-bottom: 0.35rem;
 }
 

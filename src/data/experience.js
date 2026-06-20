@@ -5,9 +5,9 @@ export const experience = [
     role: 'Senior Software Engineer',
     period: 'Feb 2019 – Present',
     bullets: [
-      'Architect, develop, and maintain secure, high-performance backend features handling financial payments, refunds, and merchant onboarding workflows using Java and Spring Boot.',
-      'Optimise database layers and transactional queries to ensure maximum processing speeds, strict data integrity, and high service availability.',
-      'Collaborate with cross-functional product, QA, and infrastructure teams within an Agile framework to scope and deploy core application upgrades.',
+      'Architected and developed KirimDOKU, a fund transfer platform enabling 100+ merchants to disburse funds, process domestic and cross-border remittances, validate bank accounts, and pay bills — integrating 9+ banks (BCA, BNI, BRI, Mandiri, OVO, and others) via SNAP-compliant and legacy REST API connectors.',
+      'Engineered Refund Service for automated cross-bank refund processing, and QRIS merchant onboarding systems including a self-registration web app, merchant mobile features, and a back-office with approval workflows and cashback engine — compliant with Bank Indonesia\'s national QR payment standard (QRIS).',
+      'Delivered backend systems contributing to DOKU\'s payment platform serving a total of 4M+ users, processing 360M+ transactions and 330T+ IDR in volume across 45+ payment methods.',
     ],
   },
   {

@@ -3,7 +3,7 @@
     <div class="card-top">
       <h3 class="card-title">{{ project.title }}</h3>
       <div class="card-links">
-        <a :href="project.githubUrl" target="_blank" rel="noopener" aria-label="GitHub">
+        <a v-if="project.githubUrl" :href="project.githubUrl" target="_blank" rel="noopener" aria-label="GitHub">
           <Code2 :size="18" />
         </a>
         <a
