@@ -18,7 +18,7 @@
         </div>
         <div class="stat">
           <span class="stat-number">3</span>
-          <span class="stat-label">Tech Stacks</span>
+          <span class="stat-label">Core Payment Products Built</span>
         </div>
       </div>
       <div class="hero-links">
